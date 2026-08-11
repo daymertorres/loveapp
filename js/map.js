@@ -41,31 +41,46 @@ document.addEventListener('DOMContentLoaded', () => {
         let myMarker = null;
         let partnerMarker = null;
         
-        // Escuchar mi ubicación para el mapa
-        onValue(ref(rtdb, 'locations/' + myRole), (snapshot) => {
-            const data = snapshot.val();
-            if(data && data.lat) {
-                if(!myMarker) {
-                    myMarker = L.marker([data.lat, data.lng], {icon: myIcon}).addTo(map);
-                } else {
-                    myMarker.setLatLng([data.lat, data.lng]);
+        // Escuchar mi ubicación para el mapa (desde Firebase, por si acaso)
+        try {
+            onValue(ref(rtdb, 'locations/' + myRole), (snapshot) => {
+                const data = snapshot.val();
+                if(data && data.lat) {
+                    if(!myMarker) {
+                        myMarker = L.marker([data.lat, data.lng], {icon: myIcon}).addTo(map);
+                    } else {
+                        myMarker.setLatLng([data.lat, data.lng]);
+                    }
+                    updateMapBounds();
                 }
-                updateMapBounds();
+            });
+        } catch(e) {}
+        
+        // Escuchar mi ubicación LOCALMENTE (Instantáneo, incluso si Firebase falla)
+        window.addEventListener('myLocationUpdated', (e) => {
+            const data = e.detail;
+            if(!myMarker) {
+                myMarker = L.marker([data.lat, data.lng], {icon: myIcon}).addTo(map);
+            } else {
+                myMarker.setLatLng([data.lat, data.lng]);
             }
+            updateMapBounds();
         });
         
         // Escuchar ubicación pareja
-        onValue(ref(rtdb, 'locations/' + partnerRole), (snapshot) => {
-            const data = snapshot.val();
-            if(data && data.lat) {
-                if(!partnerMarker) {
-                    partnerMarker = L.marker([data.lat, data.lng], {icon: partnerIcon}).addTo(map);
-                } else {
-                    partnerMarker.setLatLng([data.lat, data.lng]);
+        try {
+            onValue(ref(rtdb, 'locations/' + partnerRole), (snapshot) => {
+                const data = snapshot.val();
+                if(data && data.lat) {
+                    if(!partnerMarker) {
+                        partnerMarker = L.marker([data.lat, data.lng], {icon: partnerIcon}).addTo(map);
+                    } else {
+                        partnerMarker.setLatLng([data.lat, data.lng]);
+                    }
+                    updateMapBounds();
                 }
-                updateMapBounds();
-            }
-        });
+            });
+        } catch(e) {}
         
         function updateMapBounds() {
             if (myMarker && partnerMarker) {

@@ -74,33 +74,42 @@ document.addEventListener('DOMContentLoaded', () => {
     set(myStatusRef, { online: true, last_changed: serverTimestamp() });
     onDisconnect(myStatusRef).set({ online: false, last_changed: serverTimestamp() });
     
-    // Función para obtener mi ubicación (Usando Geolocation API)
-    const updateMyLocation = () => {
+    // Función para obtener mi ubicación (Usando Geolocation API) continuamente
+    let watchId;
+    const startLocationTracking = () => {
         if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition((position) => {
+            watchId = navigator.geolocation.watchPosition((position) => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
                 console.log(`Mi ubicación: ${lat}, ${lng}`);
                 myLastCoords = { lat, lng };
                 
+                // Disparar evento para que el mapa se actualice al instante sin esperar a Firebase
+                window.dispatchEvent(new CustomEvent('myLocationUpdated', { detail: { lat, lng } }));
+                
                 // Enviar a Firebase
-                const myLocRef = ref(rtdb, 'locations/' + myRole);
-                set(myLocRef, { lat, lng, timestamp: serverTimestamp() });
+                try {
+                    const myLocRef = ref(rtdb, 'locations/' + myRole);
+                    set(myLocRef, { lat, lng, timestamp: serverTimestamp() });
+                } catch(e) {
+                    console.error("Firebase no configurado aún", e);
+                }
                 
                 updateDistance();
             }, (error) => {
                 console.warn("Error obteniendo ubicación:", error.message);
+                if(partnerLocationText && error.code === 1) partnerLocationText.innerText = "Permiso denegado";
             }, {
                 enableHighAccuracy: true,
-                timeout: 10000
+                maximumAge: 5000,
+                timeout: 27000
             });
+        } else {
+            console.warn("Geolocalización no soportada");
         }
     };
     
-    updateMyLocation();
-    
-    // Actualizar cada 30 segundos
-    setInterval(updateMyLocation, 30000);
+    startLocationTracking();
     
     // Haversine formula para calcular distancia
     function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
