@@ -1,5 +1,8 @@
 // js/chat.js
 
+import { rtdb } from './firebase.js';
+import { ref, push, onChildAdded, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     const chatForm = document.getElementById('chatForm');
     const messageInput = document.getElementById('messageInput');
@@ -14,8 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         scrollToBottom();
 
-        import { rtdb } from './firebase.js';
-        import { ref, push, onChildAdded, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
         
         const myRole = window.getMyId ? window.getMyId() : localStorage.getItem('myRole') || 'userA';
         const partnerRole = window.getPartnerId ? window.getPartnerId() : localStorage.getItem('partnerRole') || 'userB';

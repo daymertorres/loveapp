@@ -1,8 +1,9 @@
 // js/location.js
 
+import { rtdb } from './firebase.js';
+import { ref, set, onValue, serverTimestamp, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
 document.addEventListener('DOMContentLoaded', () => {
-    import { rtdb } from './firebase.js';
-    import { ref, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
     
     // Obtener roles de localStorage
     const myRole = window.getMyId ? window.getMyId() : localStorage.getItem('myRole') || 'userA';
@@ -69,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Registrar mi propio estado
     const myStatusRef = ref(rtdb, 'status/' + myRole);
-    import { onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
     
     set(myStatusRef, { online: true, last_changed: serverTimestamp() });
     onDisconnect(myStatusRef).set({ online: false, last_changed: serverTimestamp() });

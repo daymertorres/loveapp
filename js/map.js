@@ -1,5 +1,8 @@
 // js/map.js
 
+import { rtdb } from './firebase.js';
+import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     const mapElement = document.getElementById('map');
     
@@ -30,8 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
             iconAnchor: [20, 20]
         });
 
-        import { rtdb } from './firebase.js';
-        import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
         
         const myRole = window.getMyId ? window.getMyId() : localStorage.getItem('myRole') || 'userA';
         const partnerRole = window.getPartnerId ? window.getPartnerId() : localStorage.getItem('partnerRole') || 'userB';
