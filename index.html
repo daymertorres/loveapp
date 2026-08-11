@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LoveTrack - Conectados siempre</title>
+    <meta name="description" content="App web PWA para parejas, comparte ubicación en tiempo real y momentos.">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <style>
+        .splash-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: var(--gradient-primary);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .splash-screen i {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: heartbeat 1.5s infinite;
+        }
+        .splash-screen h1 {
+            font-size: 36px;
+            color: white;
+            margin-bottom: 10px;
+        }
+        .splash-screen p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+        .btn-white {
+            background: white;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+        .btn-transparent {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            14% { transform: scale(1.1); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.1); }
+            70% { transform: scale(1); }
+        }
+        /* Identity Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .modal-overlay.active { display: flex; }
+        .identity-modal {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius-lg);
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+            box-shadow: var(--shadow-strong);
+        }
+        .identity-modal h2 { margin-bottom: 10px; color: var(--text-main); }
+        .identity-modal p { margin-bottom: 24px; font-size: 14px; }
+        .identity-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 16px;
+            border-radius: var(--border-radius-md);
+            margin-bottom: 12px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .identity-btn:active { transform: scale(0.98); }
+        .identity-btn.primary {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="splash-screen animate-fade-in">
+            <i class="fa-solid fa-heart"></i>
+            <h1>LoveTrack</h1>
+            <p>Siempre cerca, sin importar la distancia</p>
+            
+            <div style="width: 100%; max-width: 300px; margin-top: auto; margin-bottom: 40px;">
+                <button id="enterAppBtn" class="btn btn-white">Entrar a LoveTrack</button>
+            </div>
+        </div>
+
+        <!-- Identity Modal -->
+        <div class="modal-overlay" id="identityModal">
+            <div class="identity-modal">
+                <h2>¿Quién eres?</h2>
+                <p>Selecciona tu identidad para sincronizar los datos correctamente.</p>
+                <button class="identity-btn primary" onclick="setIdentity('userA')">Soy la Persona A</button>
+                <button class="identity-btn" onclick="setIdentity('userB')">Soy la Persona B</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mapa - LoveTrack</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .map-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 70px); /* Minus bottom nav */
+            z-index: 1;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        .map-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            z-index: 400; /* Above map but below modals */
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        .map-overlay > * {
+            pointer-events: auto;
+        }
+        .map-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            padding: 12px 16px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-glass);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        [data-theme="dark"] .map-card { border-color: rgba(255,255,255,0.05); }
+        .distance-badge {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+        .map-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .map-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: none;
+            box-shadow: var(--shadow-glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+        /* Custom Marker */
+        .custom-marker {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .custom-marker.partner {
+            background-color: #a29bfe;
+            border-color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        
+        <div class="map-container">
+            <div id="map"></div>
+            
+            <div class="map-overlay">
+                <div class="map-card">
+                    <i class="fa-solid fa-route" style="color: var(--text-muted);"></i>
+                    <div class="distance-badge" id="mapDistance">-- km</div>
+                </div>
+                
+                <div class="map-controls">
+                    <button class="map-btn" id="centerMapBtn" title="Centrar en mi pareja">
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                    </button>
+                    <button class="map-btn" id="toggleLocationBtn" title="Pausar ubicación">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav glass">
+            <a href="home.html" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span>Inicio</span>
+            </a>
+            <a href="map.html" class="nav-item active">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <span>Mapa</span>
+            </a>
+            <a href="chat.html" class="nav-item">
+                <i class="fa-solid fa-comment-dots"></i>
+                <span>Chat</span>
+            </a>
+            <a href="moments.html" class="nav-item">
+                <i class="fa-solid fa-images"></i>
+                <span>Momentos</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <i class="fa-solid fa-user"></i>
+                <span>Perfil</span>
+            </a>
+        </nav>
+    </div>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script type="module" src="js/firebase.js"></script>
+    <script type="module" src="js/map.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

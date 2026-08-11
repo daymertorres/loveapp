@@ -1,0 +1,16 @@
+# Firebase y credenciales locales (si decides usar archivos .env con algún bundler en el futuro)
+.env
+.env.local
+
+# Dependencias (si agregas npm en el futuro)
+node_modules/
+package-lock.json
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

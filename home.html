@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inicio - LoveTrack</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .couple-avatars {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            border: 2px solid white;
+            box-shadow: var(--shadow-soft);
+            object-fit: cover;
+        }
+        .avatar-group {
+            display: flex;
+        }
+        .avatar-group .avatar:nth-child(2) {
+            margin-left: -15px;
+            background-color: #a29bfe;
+        }
+        .header-title h2 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .status-badge.offline {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2ecc71;
+        }
+        .status-badge.offline .status-dot {
+            background: #e74c3c;
+        }
+        
+        /* Widgets Grid */
+        .widgets-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .widget {
+            background: var(--card-bg);
+            border-radius: var(--border-radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-glass);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: transform var(--transition-fast);
+        }
+        .widget:active {
+            transform: scale(0.96);
+        }
+        .widget-large {
+            grid-column: span 2;
+        }
+        .widget-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+        .w-location .widget-icon { background: rgba(255, 75, 114, 0.1); color: var(--primary-color); }
+        .w-distance .widget-icon { background: rgba(52, 152, 219, 0.1); color: #3498db; }
+        .w-battery .widget-icon { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
+        .w-days .widget-icon { background: rgba(155, 89, 182, 0.1); color: #9b59b6; }
+        
+        .widget-title {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .widget-value {
+            font-size: 22px;
+            font-weight: 800;
+        }
+        .widget-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: -6px;
+        }
+        
+        /* Quick Action */
+        .quick-action-btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-lg);
+            padding: 16px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: var(--shadow-soft);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            margin-bottom: 24px;
+        }
+        .quick-action-btn:active {
+            transform: scale(0.98);
+            box-shadow: var(--shadow-strong);
+        }
+        .quick-action-btn i {
+            animation: heartbeat 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="content-area animate-fade-in">
+            <div class="dashboard-header">
+                <div class="header-title">
+                    <div class="status-badge" id="partnerStatus">
+                        <div class="status-dot"></div>
+                        <span>En línea</span>
+                    </div>
+                    <h2>Hola, <span id="userName">Amor</span></h2>
+                </div>
+                <div class="avatar-group">
+                    <div class="avatar" id="myAvatar">Yo</div>
+                    <div class="avatar" id="partnerAvatar"><i class="fa-solid fa-heart"></i></div>
+                </div>
+            </div>
+            
+            <button class="quick-action-btn" id="missYouBtn">
+                <i class="fa-solid fa-heart"></i> Te extraño
+            </button>
+            
+            <div class="widgets-grid">
+                <!-- Location Widget -->
+                <a href="map.html" class="widget widget-large w-location glass">
+                    <div class="widget-icon"><i class="fa-solid fa-location-dot"></i></div>
+                    <div>
+                        <div class="widget-title">Ubicación de tu pareja</div>
+                        <div class="widget-value" id="partnerLocationText">Buscando...</div>
+                        <div class="widget-subtitle" id="lastUpdatedText">Actualizando...</div>
+                    </div>
+                </a>
+                
+                <!-- Distance Widget -->
+                <div class="widget w-distance glass">
+                    <div class="widget-icon"><i class="fa-solid fa-route"></i></div>
+                    <div class="widget-title">Distancia</div>
+                    <div class="widget-value" id="distanceText">-- km</div>
+                </div>
+                
+                <!-- Battery Widget -->
+                <div class="widget w-battery glass">
+                    <div class="widget-icon"><i class="fa-solid fa-battery-full"></i></div>
+                    <div class="widget-title">Su Batería</div>
+                    <div class="widget-value" id="partnerBattery">--%</div>
+                </div>
+                
+                <!-- Days Together Widget -->
+                <a href="moments.html" class="widget widget-large w-days glass">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div class="widget-icon"><i class="fa-regular fa-calendar-heart"></i></div>
+                            <div class="widget-title">Días juntos</div>
+                        </div>
+                        <div class="widget-value" id="daysTogether" style="font-size: 32px; color: var(--primary-color);">0</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav glass">
+            <a href="home.html" class="nav-item active">
+                <i class="fa-solid fa-house"></i>
+                <span>Inicio</span>
+            </a>
+            <a href="map.html" class="nav-item">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <span>Mapa</span>
+            </a>
+            <a href="chat.html" class="nav-item">
+                <i class="fa-solid fa-comment-dots"></i>
+                <span>Chat</span>
+            </a>
+            <a href="moments.html" class="nav-item">
+                <i class="fa-solid fa-images"></i>
+                <span>Momentos</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <i class="fa-solid fa-user"></i>
+                <span>Perfil</span>
+            </a>
+        </nav>
+    </div>
+    
+    <script type="module" src="js/firebase.js"></script>
+    <script type="module" src="js/location.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
