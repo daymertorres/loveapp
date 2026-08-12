@@ -1,37 +1,28 @@
 // js/firebase.js
-// IMPORTANTE: Reemplaza esta configuración con la de tu proyecto de Firebase.
-// 1. Ve a la Consola de Firebase (https://console.firebase.google.com/)
-// 2. Crea un proyecto y añade una aplicación web
-// 3. Copia el objeto firebaseConfig y pégalo aquí.
+// Configuración real de Firebase con Realtime Database habilitado
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getDatabase } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSy_YOUR_API_KEY_HERE",
-    authDomain: "your-project-id.firebaseapp.com",
-    projectId: "your-project-id",
-    storageBucket: "your-project-id.appspot.com",
-    messagingSenderId: "1234567890",
-    appId: "1:1234567890:web:abcdef123456",
-    databaseURL: "https://your-project-id.firebaseio.com"
+  apiKey: "AIzaSyBdh8Vcp4le1ElBzYUDDQZIG1f6DzSDh5k",
+  authDomain: "loveapp-9d012.firebaseapp.com",
+  projectId: "loveapp-9d012",
+  storageBucket: "loveapp-9d012.firebasestorage.app",
+  messagingSenderId: "538973496059",
+  appId: "1:538973496059:web:bc1acbf9ff519b3aa7065e",
+  // IMPORTANTE: Realtime Database URL (asegúrate de habilitarla en Firebase Console)
+  databaseURL: "https://loveapp-9d012-default-rtdb.firebaseio.com"
 };
 
-// Inicializar Firebase (Comentado para evitar errores si no hay configuración real aún)
-let app, db, rtdb;
+let rtdb;
 
 try {
-    // Habilitando inicialización real. ¡OJO! Sin configuración válida fallará.
-    app = initializeApp(firebaseConfig);
-    db = getFirestore(app);
-    rtdb = getDatabase(app);
-    console.log("Firebase inicializado. Esperando que configures apiKey válida.");
-
-    console.log("Esperando configuración real de Firebase...");
+  const app = initializeApp(firebaseConfig);
+  rtdb = getDatabase(app);
+  console.log("[Firebase] Inicializado correctamente ✓");
 } catch (error) {
-    console.error("Error al inicializar Firebase:", error);
+  console.error("[Firebase] Error al inicializar:", error);
 }
 
-export { db, rtdb };
+export { rtdb };

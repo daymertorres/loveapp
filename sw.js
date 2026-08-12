@@ -1,57 +1,83 @@
-const CACHE_NAME = 'lovetrack-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
+// sw.js - Service Worker para LoveTrack PWA
+// Solo cachea archivos estáticos del shell, NO intercepta Firebase
 
-  '/home.html',
-  '/map.html',
-  '/chat.html',
-  '/moments.html',
-  '/profile.html',
-  '/css/style.css',
-  '/js/app.js',
-
-  '/js/chat.js',
-  '/js/firebase.js',
-  '/js/location.js',
-  '/js/map.js',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+const CACHE_NAME  = 'lovetrack-v3';
+const SHELL_CACHE = [
+    '/index.html',
+    '/home.html',
+    '/map.html',
+    '/chat.html',
+    '/moments.html',
+    '/profile.html',
+    '/css/style.css',
+    '/js/app.js',
+    '/js/firebase.js',
+    '/js/location.js',
+    '/js/map.js',
+    '/js/chat.js',
+    '/manifest.json'
 ];
 
-// Instalar SW
+// ── Instalar: pre-cache del shell ──────────────────────────
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        return cache.addAll(urlsToCache);
-      })
-  );
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => cache.addAll(SHELL_CACHE))
+            .then(() => self.skipWaiting())
+    );
 });
 
-// Cache and Return requests
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Return cache or fetch network
-        return response || fetch(event.request);
-      })
-  );
-});
-
-// Update SW
+// ── Activar: limpiar caches viejos ─────────────────────────
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
+    event.waitUntil(
+        caches.keys()
+            .then(keys =>
+                Promise.all(
+                    keys
+                        .filter(k => k !== CACHE_NAME)
+                        .map(k => caches.delete(k))
+                )
+            )
+            .then(() => self.clients.claim())
+    );
+});
+
+// ── Fetch: estrategia Network-first para Firebase, Cache-first para shell ──
+self.addEventListener('fetch', event => {
+    const url = event.request.url;
+
+    // NO interceptar Firebase, Google APIs, ni peticiones POST
+    if (
+        url.includes('firebaseio.com') ||
+        url.includes('firestore.googleapis.com') ||
+        url.includes('googleapis.com') ||
+        url.includes('gstatic.com') ||
+        url.includes('nominatim.openstreetmap.org') ||
+        url.includes('unpkg.com') ||
+        url.includes('fonts.googleapis.com') ||
+        url.includes('cdnjs.cloudflare.com') ||
+        url.includes('cartocdn.com') ||
+        url.includes('basemaps') ||
+        event.request.method !== 'GET'
+    ) {
+        return; // Dejar que el browser lo maneje directamente
+    }
+
+    // Para archivos del shell: Cache-first
+    event.respondWith(
+        caches.match(event.request)
+            .then(cached => {
+                if (cached) return cached;
+                return fetch(event.request)
+                    .then(response => {
+                        if (response && response.status === 200) {
+                            const clone = response.clone();
+                            caches.open(CACHE_NAME)
+                                .then(cache => cache.put(event.request, clone));
+                        }
+                        return response;
+                    })
+                    .catch(() => caches.match('/index.html'));
+            })
+    );
 });

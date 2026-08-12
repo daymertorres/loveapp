@@ -2,16 +2,15 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="LoveTrack">
     <title>LoveTrack - Conectados siempre</title>
-    <meta name="description" content="App web PWA para parejas, comparte ubicación en tiempo real y momentos.">
-    <!-- Google Fonts -->
+    <meta name="description" content="App web PWA para parejas, comparte ubicación en tiempo real y momentos especiales.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
-    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <style>
         .splash-screen {
@@ -19,72 +18,98 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
             background: var(--gradient-primary);
             color: white;
             text-align: center;
-            padding: 20px;
+            padding: 40px 28px;
+            padding-bottom: max(40px, env(safe-area-inset-bottom));
         }
-        .splash-screen i {
+        .splash-icon-wrap {
+            position: relative;
+            margin-bottom: 32px;
+        }
+        .splash-icon-wrap i {
             font-size: 80px;
-            margin-bottom: 20px;
-            animation: heartbeat 1.5s infinite;
+            animation: heartbeat 1.5s ease infinite;
+            display: block;
+        }
+        .splash-ring {
+            position: absolute;
+            inset: -20px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.3);
+            animation: pulse-ring 2s ease-out infinite;
         }
         .splash-screen h1 {
-            font-size: 36px;
+            font-size: 40px;
             color: white;
             margin-bottom: 10px;
+            letter-spacing: -1px;
         }
         .splash-screen p {
             color: rgba(255, 255, 255, 0.9);
-            font-size: 18px;
-            margin-bottom: 40px;
+            font-size: 17px;
+            margin-bottom: 60px;
+            max-width: 280px;
         }
         .btn-white {
             background: white;
             color: var(--primary-color);
-            margin-bottom: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            margin-bottom: 14px;
+            font-weight: 700;
         }
+        .btn-white:active { transform: scale(0.97); }
         .btn-transparent {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             color: white;
+            border: 1.5px solid rgba(255,255,255,0.4);
         }
-        
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            14% { transform: scale(1.1); }
-            28% { transform: scale(1); }
-            42% { transform: scale(1.1); }
-            70% { transform: scale(1); }
-        }
+
         /* Identity Modal */
         .modal-overlay {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
+            inset: 0;
+            background: rgba(0,0,0,0.55);
             display: none;
-            align-items: center;
+            align-items: flex-end;
             justify-content: center;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding-bottom: env(safe-area-inset-bottom);
         }
         .modal-overlay.active { display: flex; }
         .identity-modal {
             background: var(--card-bg);
-            padding: 30px;
-            border-radius: var(--border-radius-lg);
-            width: 90%;
-            max-width: 350px;
+            padding: 28px 24px 32px;
+            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+            width: 100%;
+            max-width: 480px;
             text-align: center;
-            box-shadow: var(--shadow-strong);
+            box-shadow: 0 -20px 60px rgba(0,0,0,0.2);
+            animation: slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1);
         }
-        .identity-modal h2 { margin-bottom: 10px; color: var(--text-main); }
-        .identity-modal p { margin-bottom: 24px; font-size: 14px; }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to   { transform: translateY(0); }
+        }
+        .modal-handle {
+            width: 40px; height: 4px;
+            background: rgba(0,0,0,0.15);
+            border-radius: 2px;
+            margin: 0 auto 24px;
+        }
+        [data-theme="dark"] .modal-handle { background: rgba(255,255,255,0.15); }
+        .identity-modal h2 { margin-bottom: 8px; color: var(--text-main); font-size: 22px; }
+        .identity-modal p  { margin-bottom: 28px; font-size: 14px; }
         .identity-btn {
             background: var(--card-bg);
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 16px;
+            border: 2px solid rgba(0,0,0,0.08);
+            color: var(--text-main);
+            padding: 18px;
             border-radius: var(--border-radius-md);
             margin-bottom: 12px;
             width: 100%;
@@ -92,34 +117,61 @@
             font-weight: 600;
             cursor: pointer;
             transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-        .identity-btn:active { transform: scale(0.98); }
+        [data-theme="dark"] .identity-btn { border-color: rgba(255,255,255,0.08); }
+        .identity-btn:active { transform: scale(0.97); }
         .identity-btn.primary {
             background: var(--gradient-primary);
             color: white;
-            border: none;
+            border-color: transparent;
+            box-shadow: var(--shadow-soft);
         }
+        .avatar-small {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 13px;
+        }
+        .avatar-a { background: var(--gradient-primary); color: white; }
+        .avatar-b { background: linear-gradient(135deg, #a29bfe, #6c5ce7); color: white; }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="splash-screen animate-fade-in">
-            <i class="fa-solid fa-heart"></i>
+            <div class="splash-icon-wrap">
+                <div class="splash-ring"></div>
+                <i class="fa-solid fa-heart"></i>
+            </div>
             <h1>LoveTrack</h1>
             <p>Siempre cerca, sin importar la distancia</p>
-            
-            <div style="width: 100%; max-width: 300px; margin-top: auto; margin-bottom: 40px;">
-                <button id="enterAppBtn" class="btn btn-white">Entrar a LoveTrack</button>
+
+            <div style="width:100%; max-width:320px;">
+                <button id="enterAppBtn" class="btn btn-white">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    Entrar a LoveTrack
+                </button>
             </div>
         </div>
 
         <!-- Identity Modal -->
         <div class="modal-overlay" id="identityModal">
             <div class="identity-modal">
+                <div class="modal-handle"></div>
                 <h2>¿Quién eres?</h2>
-                <p>Selecciona tu identidad para sincronizar los datos correctamente.</p>
-                <button class="identity-btn primary" onclick="setIdentity('userA')">Soy la Persona A</button>
-                <button class="identity-btn" onclick="setIdentity('userB')">Soy la Persona B</button>
+                <p>Selecciona tu identidad para sincronizar correctamente con tu pareja.</p>
+                <button class="identity-btn primary" onclick="setIdentity('userA')">
+                    <div class="avatar-small avatar-a">A</div>
+                    Soy la Persona A
+                </button>
+                <button class="identity-btn" onclick="setIdentity('userB')">
+                    <div class="avatar-small avatar-b">B</div>
+                    Soy la Persona B
+                </button>
             </div>
         </div>
     </div>

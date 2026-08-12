@@ -2,69 +2,53 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Perfil - LoveTrack</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
     <style>
         .profile-header {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 40px 20px 20px;
+            padding: 32px 20px 24px;
             text-align: center;
         }
         .profile-avatar {
-            width: 100px;
-            height: 100px;
+            width: 96px; height: 96px;
             border-radius: 50%;
             background: var(--gradient-primary);
             color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            margin-bottom: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 38px; font-weight: 700;
+            margin-bottom: 14px;
             box-shadow: var(--shadow-soft);
             border: 4px solid var(--card-bg);
         }
         .profile-name {
-            font-size: 24px;
-            margin-bottom: 4px;
+            font-size: 22px;
+            margin-bottom: 6px;
         }
-        .profile-email {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-        }
-        
-        .pairing-code {
-            background: rgba(255, 75, 114, 0.1);
+        .profile-role-badge {
+            font-size: 13px;
             color: var(--primary-color);
-            padding: 8px 16px;
+            background: rgba(255,75,114,0.1);
+            padding: 4px 14px;
             border-radius: 20px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            font-size: 18px;
-            margin-bottom: 8px;
-            display: inline-block;
-        }
-        .pairing-text {
-            font-size: 12px;
-            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 20px;
         }
 
-        .settings-group {
-            margin-top: 24px;
+        .settings-section {
             padding: 0 20px;
+            margin-bottom: 24px;
         }
         .settings-title {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 700;
             color: var(--text-muted);
             margin-bottom: 12px;
             text-transform: uppercase;
@@ -72,14 +56,14 @@
         }
         .setting-item {
             background: var(--card-bg);
-            padding: 16px;
+            padding: 15px 16px;
             border-radius: var(--border-radius-md);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-            border: 1px solid rgba(0,0,0,0.05);
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.04);
         }
         [data-theme="dark"] .setting-item { border-color: rgba(255,255,255,0.05); }
         .setting-label {
@@ -88,96 +72,167 @@
             gap: 12px;
             font-weight: 500;
             color: var(--text-main);
+            font-size: 15px;
         }
         .setting-label i {
             color: var(--primary-color);
-            font-size: 20px;
-            width: 24px;
+            font-size: 19px;
+            width: 22px;
             text-align: center;
         }
-        
+        .setting-sublabel {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
         /* Toggle Switch */
         .switch {
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 28px;
+            width: 50px; height: 28px;
+            flex-shrink: 0;
         }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute;
             cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
+            inset: 0;
+            background-color: #ddd;
+            transition: .3s;
             border-radius: 34px;
         }
         .slider:before {
             position: absolute;
             content: "";
-            height: 20px;
-            width: 20px;
-            left: 4px;
-            bottom: 4px;
+            height: 20px; width: 20px;
+            left: 4px; bottom: 4px;
             background-color: white;
-            transition: .4s;
+            transition: .3s;
             border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         input:checked + .slider { background-color: var(--primary-color); }
         input:checked + .slider:before { transform: translateX(22px); }
-        
 
+        /* Date input */
+        .date-input {
+            background: var(--bg-color);
+            border: 1.5px solid rgba(0,0,0,0.08);
+            color: var(--text-main);
+            border-radius: 10px;
+            padding: 6px 10px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        [data-theme="dark"] .date-input { border-color: rgba(255,255,255,0.1); }
+
+        /* Pairing code */
+        .pairing-card {
+            background: rgba(255,75,114,0.06);
+            border: 1.5px dashed var(--primary-color);
+            border-radius: var(--border-radius-md);
+            padding: 16px;
+            text-align: center;
+            margin: 0 20px 12px;
+        }
+        .pairing-code {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary-color);
+            letter-spacing: 4px;
+            margin-bottom: 6px;
+        }
+        .pairing-text { font-size: 12px; color: var(--text-muted); }
+
+        /* Danger button */
+        .danger-btn {
+            background: rgba(231,76,60,0.08);
+            color: #e74c3c;
+            border: none;
+            border-radius: var(--border-radius-md);
+            padding: 14px;
+            width: 100%;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .danger-btn:active { background: rgba(231,76,60,0.15); transform: scale(0.98); }
     </style>
 </head>
 <body>
     <div class="app-container">
-        
-        <div class="content-area" style="padding: 0;">
+        <div class="content-area" style="padding-top:0;">
+
+            <!-- Header -->
             <div class="profile-header animate-fade-in">
                 <div class="profile-avatar">M</div>
                 <h2 class="profile-name">Mi Nombre</h2>
-                <p class="profile-email">usuario@correo.com</p>
-                
-                <div style="margin-top: 16px;">
-                    <div class="pairing-code">LV-892A</div>
-                    <div class="pairing-text">Código de pareja. Compártelo para conectar.</div>
-                </div>
+                <div class="profile-role-badge" id="roleBadge">Persona A</div>
             </div>
-            
-            <div class="settings-group animate-fade-in" style="animation-delay: 0.1s;">
-                <div class="settings-title">Configuración</div>
-                
+
+            <!-- Código de pareja -->
+            <div class="pairing-card">
+                <div class="pairing-code" id="pairingCode">LV-A001</div>
+                <div class="pairing-text">Tu código de identidad. Tu pareja es la otra persona.</div>
+            </div>
+
+            <!-- Configuración -->
+            <div class="settings-section animate-fade-in" style="animation-delay:0.1s; margin-top:24px;">
+                <div class="settings-title">Apariencia</div>
+
                 <div class="setting-item">
-                    <div class="setting-label">
-                        <i class="fa-solid fa-moon"></i> Modo Oscuro
+                    <div>
+                        <div class="setting-label"><i class="fa-solid fa-moon"></i> Modo Oscuro</div>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="darkModeToggle">
                         <span class="slider"></span>
                     </label>
                 </div>
-                
+            </div>
+
+            <div class="settings-section animate-fade-in" style="animation-delay:0.15s;">
+                <div class="settings-title">Privacidad</div>
+
                 <div class="setting-item">
-                    <div class="setting-label">
-                        <i class="fa-solid fa-location-dot"></i> Compartir Ubicación
+                    <div>
+                        <div class="setting-label"><i class="fa-solid fa-location-dot"></i> Compartir Ubicación</div>
+                        <div class="setting-sublabel">Tu pareja puede verte en el mapa</div>
                     </div>
                     <label class="switch">
                         <input type="checkbox" id="locationToggle" checked>
                         <span class="slider"></span>
                     </label>
                 </div>
-                
+            </div>
+
+            <div class="settings-section animate-fade-in" style="animation-delay:0.2s;">
+                <div class="settings-title">Relación</div>
+
                 <div class="setting-item">
-                    <div class="setting-label">
-                        <i class="fa-solid fa-bell"></i> Notificaciones
+                    <div>
+                        <div class="setting-label"><i class="fa-solid fa-calendar-heart"></i> Inicio de relación</div>
+                        <div class="setting-sublabel">Calcula los días juntos</div>
                     </div>
-                    <label class="switch">
-                        <input type="checkbox" id="notificationsToggle" checked>
-                        <span class="slider"></span>
-                    </label>
+                    <input type="date" class="date-input" id="startDateInput">
                 </div>
             </div>
-            
+
+            <!-- Cambiar identidad -->
+            <div class="settings-section animate-fade-in" style="animation-delay:0.25s;">
+                <button class="danger-btn" id="changeIdentityBtn">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    Cambiar identidad (A / B)
+                </button>
+            </div>
 
         </div>
 
@@ -205,9 +260,19 @@
             </a>
         </nav>
     </div>
-    
-    <script type="module" src="js/firebase.js"></script>
 
     <script src="js/app.js"></script>
+    <script>
+        // Actualizar badge de rol e info
+        document.addEventListener('DOMContentLoaded', () => {
+            const role = window.getMyId();
+            const isA  = role === 'userA';
+            const roleBadge    = document.getElementById('roleBadge');
+            const pairingCode  = document.getElementById('pairingCode');
+
+            if (roleBadge)   roleBadge.innerText   = isA ? 'Persona A' : 'Persona B';
+            if (pairingCode) pairingCode.innerText  = isA ? 'LV-A001' : 'LV-B002';
+        });
+    </script>
 </body>
 </html>

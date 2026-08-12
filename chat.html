@@ -2,114 +2,134 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Chat - LoveTrack</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
     <style>
         .chat-container {
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 70px); /* minus bottom nav */
+            height: 100vh;
+            height: -webkit-fill-available;
             padding: 0;
+            overflow: hidden;
         }
+
+        /* Header */
         .chat-header {
-            padding: 16px 20px;
+            padding: 12px 16px;
+            padding-top: max(12px, env(safe-area-inset-top));
             display: flex;
             align-items: center;
             gap: 12px;
             background: var(--bg-glass);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
             z-index: 10;
+            flex-shrink: 0;
         }
         [data-theme="dark"] .chat-header { border-bottom-color: rgba(255,255,255,0.05); }
         .chat-header .avatar {
-            width: 40px;
-            height: 40px;
+            width: 42px; height: 42px;
             border-radius: 50%;
-            background-color: var(--primary-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700; font-size: 16px;
+            flex-shrink: 0;
         }
-        .chat-header-info h3 {
-            font-size: 16px;
-            margin-bottom: 2px;
-        }
-        .chat-header-info p {
-            font-size: 12px;
-            color: #2ecc71; /* Online color */
-        }
+        .chat-header-info h3 { font-size: 16px; margin-bottom: 1px; }
+        .chat-header-info p  { font-size: 12px; color: #27ae60; font-weight: 500; }
+
+        /* Messages */
         .chat-messages {
             flex: 1;
-            padding: 20px;
+            padding: 16px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
         }
+
         .message {
-            max-width: 75%;
-            padding: 12px 16px;
+            max-width: 78%;
+            padding: 11px 15px;
             border-radius: 20px;
-            font-size: 14px;
-            position: relative;
-            animation: fadeIn 0.3s ease;
+            font-size: 15px;
+            line-height: 1.45;
+            word-break: break-word;
         }
         .message.received {
             background: var(--card-bg);
             align-self: flex-start;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
         .message.sent {
             background: var(--gradient-primary);
             color: white;
             align-self: flex-end;
-            border-bottom-right-radius: 4px;
-            box-shadow: 0 4px 10px rgba(255,75,114,0.2);
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 4px 14px rgba(255,75,114,0.25);
         }
         .message-time {
             font-size: 10px;
             margin-top: 4px;
-            opacity: 0.7;
+            opacity: 0.65;
             text-align: right;
             display: block;
         }
         .message.sent .message-time { color: rgba(255,255,255,0.9); }
         .message.received .message-time { color: var(--text-muted); }
-        
-        .chat-input-container {
-            padding: 16px;
-            background: var(--bg-glass);
-            backdrop-filter: blur(12px);
-            border-top: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+
+        /* Typing indicator */
+        .typing-indicator {
+            padding: 0 16px 6px;
+            font-size: 13px;
+            color: var(--text-muted);
+            display: none;
+            font-style: italic;
         }
-        [data-theme="dark"] .chat-input-container { border-top-color: rgba(255,255,255,0.05); }
+
+        /* Input */
+        .chat-input-area {
+            padding: 10px 12px;
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(0,0,0,0.06);
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        [data-theme="dark"] .chat-input-area { border-top-color: rgba(255,255,255,0.05); }
         .chat-input {
             flex: 1;
             background: var(--card-bg);
-            border: 1px solid rgba(0,0,0,0.1);
-            padding: 12px 16px;
-            border-radius: 24px;
-            font-size: 14px;
+            border: 1.5px solid rgba(0,0,0,0.08);
+            padding: 11px 16px;
+            border-radius: 22px;
+            font-size: 15px;
             color: var(--text-main);
             outline: none;
+            resize: none;
+            max-height: 120px;
+            min-height: 44px;
+            font-family: inherit;
+            -webkit-appearance: none;
+            line-height: 1.4;
         }
         [data-theme="dark"] .chat-input { border-color: rgba(255,255,255,0.1); }
+        .chat-input:focus { border-color: var(--primary-color); }
         .send-btn {
-            width: 44px;
-            height: 44px;
+            width: 44px; height: 44px;
             border-radius: 50%;
             background: var(--gradient-primary);
             color: white;
@@ -120,20 +140,17 @@
             font-size: 16px;
             cursor: pointer;
             box-shadow: var(--shadow-soft);
+            flex-shrink: 0;
+            transition: all var(--transition-fast);
         }
-        .typing-indicator {
-            font-size: 12px;
-            color: var(--text-muted);
-            padding: 0 20px;
-            margin-bottom: 10px;
-            display: none; /* hidden by default */
-        }
+        .send-btn:active { transform: scale(0.9); }
+        .send-btn:disabled { opacity: 0.5; }
     </style>
 </head>
 <body>
     <div class="app-container">
-        
         <div class="chat-container">
+            <!-- Header -->
             <div class="chat-header">
                 <div class="avatar" id="chatPartnerAvatar">P</div>
                 <div class="chat-header-info">
@@ -141,33 +158,34 @@
                     <p id="chatPartnerStatus">En línea</p>
                 </div>
             </div>
-            
+
+            <!-- Mensajes -->
             <div class="chat-messages" id="messagesContainer">
-                <!-- Mock Messages -->
-                <div class="message received">
-                    ¡Hola mi amor! ❤️ ¿Cómo va tu día?
-                    <span class="message-time">10:30 AM</span>
-                </div>
-                <div class="message sent">
-                    ¡Hola! Todo bien por aquí, extrañándote mucho.
-                    <span class="message-time">10:32 AM</span>
-                </div>
+                <!-- Los mensajes se cargan desde Firebase -->
             </div>
-            
+
+            <!-- Indicador de escritura -->
             <div class="typing-indicator" id="typingIndicator">
-                Escribiendo...
+                ✍️ Escribiendo...
             </div>
-            
-            <form class="chat-input-container" id="chatForm">
-                <input type="text" class="chat-input" id="messageInput" placeholder="Escribe un mensaje..." autocomplete="off">
-                <button type="submit" class="send-btn">
+
+            <!-- Input -->
+            <form class="chat-input-area" id="chatForm">
+                <textarea
+                    class="chat-input"
+                    id="messageInput"
+                    placeholder="Escribe un mensaje..."
+                    autocomplete="off"
+                    rows="1"
+                ></textarea>
+                <button type="submit" class="send-btn" id="sendBtn">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </form>
         </div>
 
         <!-- Bottom Navigation -->
-        <nav class="bottom-nav glass">
+        <nav class="bottom-nav glass" style="position:fixed;">
             <a href="home.html" class="nav-item">
                 <i class="fa-solid fa-house"></i>
                 <span>Inicio</span>
@@ -190,9 +208,8 @@
             </a>
         </nav>
     </div>
-    
-    <script type="module" src="js/firebase.js"></script>
-    <script type="module" src="js/chat.js"></script>
+
     <script src="js/app.js"></script>
+    <script type="module" src="js/chat.js"></script>
 </body>
 </html>

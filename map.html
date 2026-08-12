@@ -2,70 +2,76 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Mapa - LoveTrack</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <!-- CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .map-container {
+        body, .app-container { overflow: hidden; }
+
+        .map-wrapper {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: calc(100% - 70px); /* Minus bottom nav */
+            top: 0; left: 0; right: 0;
+            bottom: calc(64px + env(safe-area-inset-bottom));
             z-index: 1;
         }
-        #map {
-            width: 100%;
-            height: 100%;
-        }
+        #map { width: 100%; height: 100%; }
+
+        /* Overlay superior */
         .map-overlay {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            z-index: 400; /* Above map but below modals */
+            top: max(16px, env(safe-area-inset-top));
+            left: 16px; right: 16px;
+            z-index: 400;
             display: flex;
             justify-content: space-between;
+            align-items: flex-start;
             pointer-events: none;
         }
-        .map-overlay > * {
-            pointer-events: auto;
-        }
+        .map-overlay > * { pointer-events: auto; }
+
         .map-card {
             background: var(--bg-glass);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             padding: 12px 16px;
             border-radius: var(--border-radius-lg);
             box-shadow: var(--shadow-glass);
             display: flex;
             align-items: center;
-            gap: 12px;
-            border: 1px solid rgba(255,255,255,0.2);
+            gap: 10px;
+            border: 1px solid rgba(255,255,255,0.25);
         }
-        [data-theme="dark"] .map-card { border-color: rgba(255,255,255,0.05); }
+        [data-theme="dark"] .map-card { border-color: rgba(255,255,255,0.06); }
         .distance-badge {
-            font-weight: 700;
+            font-weight: 800;
             color: var(--primary-color);
-            font-size: 16px;
+            font-size: 18px;
         }
+        .distance-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Botones de control */
         .map-controls {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
         .map-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: var(--card-bg);
-            border: none;
+            width: 46px; height: 46px;
+            border-radius: 14px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.25);
             box-shadow: var(--shadow-glass);
             display: flex;
             align-items: center;
@@ -73,52 +79,89 @@
             font-size: 18px;
             color: var(--text-main);
             cursor: pointer;
+            transition: all var(--transition-fast);
         }
-        /* Custom Marker */
-        .custom-marker {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 3px solid white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            background-color: var(--primary-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .map-btn:active { transform: scale(0.9); }
+        .map-btn.primary {
+            background: var(--gradient-primary);
             color: white;
-            font-weight: bold;
+            border-color: transparent;
         }
-        .custom-marker.partner {
-            background-color: #a29bfe;
-            border-color: white;
+        [data-theme="dark"] .map-btn { border-color: rgba(255,255,255,0.06); }
+
+        /* Bottom Nav encima del mapa */
+        .bottom-nav {
+            z-index: 500;
         }
+
+        /* Leaflet tweaks */
+        .leaflet-control-attribution {
+            font-size: 9px !important;
+            background: rgba(255,255,255,0.7) !important;
+            backdrop-filter: blur(4px);
+        }
+        [data-theme="dark"] .leaflet-control-attribution {
+            background: rgba(0,0,0,0.5) !important;
+            color: #aaa !important;
+        }
+
+        /* Sin GPS banner */
+        .no-gps-banner {
+            position: absolute;
+            bottom: calc(80px + env(safe-area-inset-bottom));
+            left: 16px; right: 16px;
+            z-index: 500;
+            background: rgba(255,75,114,0.95);
+            color: white;
+            padding: 14px 18px;
+            border-radius: var(--border-radius-md);
+            font-size: 13px;
+            font-weight: 600;
+            display: none;
+            text-align: center;
+            box-shadow: var(--shadow-strong);
+        }
+        .no-gps-banner.show { display: block; }
     </style>
 </head>
 <body>
     <div class="app-container">
-        
-        <div class="map-container">
+        <div class="map-wrapper">
             <div id="map"></div>
-            
+
+            <!-- Overlay -->
             <div class="map-overlay">
+                <!-- Distancia -->
                 <div class="map-card">
-                    <i class="fa-solid fa-route" style="color: var(--text-muted);"></i>
-                    <div class="distance-badge" id="mapDistance">-- km</div>
+                    <i class="fa-solid fa-route" style="color:var(--primary-color);font-size:20px;"></i>
+                    <div>
+                        <div class="distance-label">Distancia</div>
+                        <div class="distance-badge" id="mapDistance">-- km</div>
+                    </div>
                 </div>
-                
+
+                <!-- Controles -->
                 <div class="map-controls">
-                    <button class="map-btn" id="centerMapBtn" title="Centrar en mi pareja">
+                    <button class="map-btn primary" id="centerMapBtn" title="Mi ubicación">
                         <i class="fa-solid fa-location-crosshairs"></i>
                     </button>
-                    <button class="map-btn" id="toggleLocationBtn" title="Pausar ubicación">
-                        <i class="fa-solid fa-eye"></i>
+                    <button class="map-btn" id="centerPartnerBtn" title="Ver pareja">
+                        <i class="fa-solid fa-heart"></i>
+                    </button>
+                    <button class="map-btn" id="centerBothBtn" title="Ver ambos">
+                        <i class="fa-solid fa-expand"></i>
                     </button>
                 </div>
+            </div>
+
+            <!-- Banner sin GPS -->
+            <div class="no-gps-banner" id="noGpsBanner">
+                📍 Activa el GPS para compartir tu ubicación
             </div>
         </div>
 
         <!-- Bottom Navigation -->
-        <nav class="bottom-nav glass">
+        <nav class="bottom-nav glass" style="position:fixed;">
             <a href="home.html" class="nav-item">
                 <i class="fa-solid fa-house"></i>
                 <span>Inicio</span>
@@ -141,11 +184,12 @@
             </a>
         </nav>
     </div>
-    
+
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script type="module" src="js/firebase.js"></script>
-    <script type="module" src="js/map.js"></script>
+    <!-- app.js PRIMERO (define window.getMyId), luego módulos -->
     <script src="js/app.js"></script>
+    <script type="module" src="js/location.js"></script>
+    <script type="module" src="js/map.js"></script>
 </body>
 </html>

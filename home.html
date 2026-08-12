@@ -2,218 +2,194 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Inicio - LoveTrack</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
     <style>
+        /* ── Dashboard Header ─── */
         .dashboard-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 24px;
         }
-        .couple-avatars {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .couple-avatars { display: flex; align-items: center; gap: 10px; }
         .avatar {
-            width: 50px;
-            height: 50px;
+            width: 48px; height: 48px;
             border-radius: 50%;
-            background-color: var(--primary-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-            border: 2px solid white;
+            background: var(--gradient-primary);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 18px; font-weight: 700;
+            border: 2.5px solid white;
             box-shadow: var(--shadow-soft);
-            object-fit: cover;
+            flex-shrink: 0;
         }
-        .avatar-group {
-            display: flex;
-        }
+        .avatar-group { display: flex; }
         .avatar-group .avatar:nth-child(2) {
-            margin-left: -15px;
-            background-color: #a29bfe;
+            margin-left: -14px;
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+            z-index: 1;
         }
-        .header-title h2 {
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            background: rgba(46, 204, 113, 0.1);
-            color: #2ecc71;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-        .status-badge.offline {
-            background: rgba(231, 76, 60, 0.1);
-            color: #e74c3c;
-        }
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #2ecc71;
-        }
-        .status-badge.offline .status-dot {
-            background: #e74c3c;
-        }
-        
-        /* Widgets Grid */
-        .widgets-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .widget {
-            background: var(--card-bg);
-            border-radius: var(--border-radius-lg);
-            padding: 20px;
-            box-shadow: var(--shadow-glass);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            text-decoration: none;
-            color: var(--text-main);
-            transition: transform var(--transition-fast);
-        }
-        .widget:active {
-            transform: scale(0.96);
-        }
-        .widget-large {
-            grid-column: span 2;
-        }
-        .widget-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            margin-bottom: 4px;
-        }
-        .w-location .widget-icon { background: rgba(255, 75, 114, 0.1); color: var(--primary-color); }
-        .w-distance .widget-icon { background: rgba(52, 152, 219, 0.1); color: #3498db; }
-        .w-battery .widget-icon { background: rgba(46, 204, 113, 0.1); color: #2ecc71; }
-        .w-days .widget-icon { background: rgba(155, 89, 182, 0.1); color: #9b59b6; }
-        
-        .widget-title {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-        .widget-value {
-            font-size: 22px;
-            font-weight: 800;
-        }
-        .widget-subtitle {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: -6px;
-        }
-        
-        /* Quick Action */
+        .header-info { display: flex; flex-direction: column; gap: 4px; }
+        .header-info h2 { font-size: 22px; }
+
+        /* ── Quick Action ─── */
         .quick-action-btn {
             background: var(--gradient-primary);
             color: white;
             border: none;
             border-radius: var(--border-radius-lg);
-            padding: 16px;
+            padding: 18px;
             width: 100%;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 17px;
+            font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             box-shadow: var(--shadow-soft);
             cursor: pointer;
             transition: all var(--transition-fast);
-            margin-bottom: 24px;
+            margin-bottom: 28px;
+            -webkit-appearance: none;
         }
         .quick-action-btn:active {
-            transform: scale(0.98);
+            transform: scale(0.97);
             box-shadow: var(--shadow-strong);
         }
-        .quick-action-btn i {
-            animation: heartbeat 1.5s infinite;
+        .quick-action-btn:disabled { opacity: 0.7; }
+        .quick-action-btn i { animation: heartbeat 1.5s ease infinite; }
+
+        /* ── Widgets Grid ─── */
+        .widgets-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .widget {
+            background: var(--card-bg);
+            border-radius: var(--border-radius-lg);
+            padding: 18px;
+            box-shadow: var(--shadow-glass);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: transform var(--transition-fast);
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+        [data-theme="dark"] .widget { border-color: rgba(255,255,255,0.04); }
+        .widget:active { transform: scale(0.96); }
+        .widget-large { grid-column: span 2; }
+        .widget-icon {
+            width: 42px; height: 42px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 19px;
+        }
+        .w-location .widget-icon { background: rgba(255,75,114,0.1);  color: var(--primary-color); }
+        .w-distance .widget-icon { background: rgba(52,152,219,0.1);  color: #3498db; }
+        .w-battery  .widget-icon { background: rgba(46,204,113,0.1);  color: #27ae60; }
+        .w-days     .widget-icon { background: rgba(155,89,182,0.1);  color: #9b59b6; }
+        .widget-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .widget-value { font-size: 22px; font-weight: 800; line-height: 1; }
+        .widget-subtitle { font-size: 12px; color: var(--text-muted); }
+
+        /* Permiso de ubicación */
+        #locationPermBtn {
+            display: none;
+            margin-top: 8px;
+            font-size: 13px;
+            color: var(--primary-color);
+            font-weight: 600;
+            background: rgba(255,75,114,0.08);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
         }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="content-area animate-fade-in">
+
+            <!-- Header -->
             <div class="dashboard-header">
-                <div class="header-title">
+                <div class="header-info">
                     <div class="status-badge" id="partnerStatus">
                         <div class="status-dot"></div>
-                        <span>En línea</span>
+                        <span>Conectando...</span>
                     </div>
-                    <h2>Hola, <span id="userName">Amor</span></h2>
+                    <h2>Hola, <span id="userName">Amor</span> 👋</h2>
                 </div>
                 <div class="avatar-group">
                     <div class="avatar" id="myAvatar">Yo</div>
                     <div class="avatar" id="partnerAvatar"><i class="fa-solid fa-heart"></i></div>
                 </div>
             </div>
-            
+
+            <!-- Botón Te Extraño -->
             <button class="quick-action-btn" id="missYouBtn">
-                <i class="fa-solid fa-heart"></i> Te extraño
+                <i class="fa-solid fa-heart"></i>
+                Te extraño
             </button>
-            
+
+            <!-- Widgets -->
             <div class="widgets-grid">
-                <!-- Location Widget -->
+                <!-- Ubicación -->
                 <a href="map.html" class="widget widget-large w-location glass">
                     <div class="widget-icon"><i class="fa-solid fa-location-dot"></i></div>
                     <div>
                         <div class="widget-title">Ubicación de tu pareja</div>
                         <div class="widget-value" id="partnerLocationText">Buscando...</div>
                         <div class="widget-subtitle" id="lastUpdatedText">Actualizando...</div>
+                        <button id="locationPermBtn">📍 Permitir ubicación en Ajustes</button>
                     </div>
                 </a>
-                
-                <!-- Distance Widget -->
+
+                <!-- Distancia -->
                 <div class="widget w-distance glass">
                     <div class="widget-icon"><i class="fa-solid fa-route"></i></div>
                     <div class="widget-title">Distancia</div>
                     <div class="widget-value" id="distanceText">-- km</div>
                 </div>
-                
-                <!-- Battery Widget -->
+
+                <!-- Batería -->
                 <div class="widget w-battery glass">
-                    <div class="widget-icon"><i class="fa-solid fa-battery-full"></i></div>
+                    <div class="widget-icon"><i class="fa-solid fa-battery-three-quarters"></i></div>
                     <div class="widget-title">Su Batería</div>
                     <div class="widget-value" id="partnerBattery">--%</div>
                 </div>
-                
-                <!-- Days Together Widget -->
+
+                <!-- Días juntos -->
                 <a href="moments.html" class="widget widget-large w-days glass">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
                         <div>
                             <div class="widget-icon"><i class="fa-regular fa-calendar-heart"></i></div>
                             <div class="widget-title">Días juntos</div>
+                            <div class="widget-subtitle">Ver momentos</div>
                         </div>
-                        <div class="widget-value" id="daysTogether" style="font-size: 32px; color: var(--primary-color);">0</div>
+                        <div class="widget-value" id="daysTogether" style="font-size:38px; color:var(--primary-color);">♡</div>
                     </div>
                 </a>
             </div>
         </div>
-        
+
         <!-- Bottom Navigation -->
         <nav class="bottom-nav glass">
             <a href="home.html" class="nav-item active">
@@ -238,9 +214,9 @@
             </a>
         </nav>
     </div>
-    
-    <script type="module" src="js/firebase.js"></script>
-    <script type="module" src="js/location.js"></script>
+
+    <!-- app.js primero (define globals), luego los módulos -->
     <script src="js/app.js"></script>
+    <script type="module" src="js/location.js"></script>
 </body>
 </html>

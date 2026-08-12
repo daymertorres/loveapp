@@ -1,22 +1,26 @@
 {
   "name": "LoveTrack",
   "short_name": "LoveTrack",
-  "description": "App para compartir ubicación en tiempo real con tu pareja.",
+  "description": "Comparte tu ubicación en tiempo real y momentos especiales con tu pareja.",
   "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ff4b72",
   "theme_color": "#ff4b72",
   "orientation": "portrait-primary",
+  "lang": "es",
   "icons": [
     {
       "src": "assets/icon-192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "assets/icon-512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ]
 }

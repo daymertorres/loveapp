@@ -2,109 +2,213 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Momentos - LoveTrack</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .header {
-            padding: 20px;
+        .moments-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 24px;
         }
-        .header h1 {
-            font-size: 24px;
+        .moments-header h1 {
+            font-size: 26px;
             color: var(--primary-color);
         }
         .add-btn {
-            width: 40px;
-            height: 40px;
+            width: 44px; height: 44px;
             border-radius: 50%;
             background: var(--gradient-primary);
             color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: none;
-            font-size: 18px;
+            display: flex; align-items: center; justify-content: center;
+            border: none; font-size: 20px;
             box-shadow: var(--shadow-soft);
             cursor: pointer;
+            transition: all var(--transition-fast);
         }
+        .add-btn:active { transform: scale(0.9); }
+
         .timeline {
-            padding: 0 20px;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px;
         }
         .moment-card {
             background: var(--card-bg);
             border-radius: var(--border-radius-lg);
             overflow: hidden;
             box-shadow: var(--shadow-glass);
-            border: 1px solid rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.04);
+            animation: fadeIn 0.4s ease;
         }
-        [data-theme="dark"] .moment-card { border-color: rgba(255,255,255,0.05); }
-        .moment-img {
+        [data-theme="dark"] .moment-card { border-color: rgba(255,255,255,0.04); }
+        .moment-emoji-img {
             width: 100%;
-            height: 250px;
-            object-fit: cover;
-            background-color: var(--primary-light); /* Placeholder */
+            height: 180px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 40px;
+            font-size: 70px;
         }
-        .moment-content {
-            padding: 16px;
+        .moment-content { padding: 16px 18px; }
+        .moment-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
         }
         .moment-date {
             font-size: 12px;
             color: var(--primary-color);
-            font-weight: 600;
-            margin-bottom: 8px;
+            font-weight: 700;
         }
+        .moment-author {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+            background: rgba(0,0,0,0.05);
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+        [data-theme="dark"] .moment-author { background: rgba(255,255,255,0.08); }
         .moment-text {
-            font-size: 14px;
+            font-size: 15px;
             color: var(--text-main);
+            line-height: 1.55;
+        }
+        .moment-delete {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            padding: 4px 6px;
+            cursor: pointer;
+            border-radius: 6px;
+            opacity: 0.5;
+        }
+        .moment-delete:active { opacity: 1; color: #e74c3c; }
+
+        /* Modal para añadir momento */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .modal-overlay.active { display: flex; }
+        .add-moment-modal {
+            background: var(--card-bg);
+            padding: 24px 20px 28px;
+            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 -20px 60px rgba(0,0,0,0.2);
+            animation: slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to   { transform: translateY(0); }
+        }
+        .modal-handle {
+            width: 40px; height: 4px;
+            background: rgba(0,0,0,0.12);
+            border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+        [data-theme="dark"] .modal-handle { background: rgba(255,255,255,0.12); }
+        .modal-title { font-size: 20px; margin-bottom: 20px; }
+
+        .emoji-picker {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .emoji-opt {
+            font-size: 28px;
+            padding: 6px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            background: none;
+            transition: all var(--transition-fast);
+        }
+        .emoji-opt.selected {
+            border-color: var(--primary-color);
+            background: rgba(255,75,114,0.08);
+        }
+        .emoji-opt:active { transform: scale(0.88); }
+
+        .moment-textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: var(--border-radius-md);
+            border: 1.5px solid rgba(0,0,0,0.08);
+            background: var(--bg-color);
+            color: var(--text-main);
+            font-size: 15px;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            margin-bottom: 8px;
+            min-height: 100px;
+            -webkit-appearance: none;
             line-height: 1.5;
         }
+        [data-theme="dark"] .moment-textarea { border-color: rgba(255,255,255,0.1); }
+        .moment-textarea:focus { border-color: var(--primary-color); }
+
+        .moment-date-input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: var(--border-radius-md);
+            border: 1.5px solid rgba(0,0,0,0.08);
+            background: var(--bg-color);
+            color: var(--text-main);
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            margin-bottom: 16px;
+            -webkit-appearance: none;
+        }
+        [data-theme="dark"] .moment-date-input { border-color: rgba(255,255,255,0.1); }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state i { font-size: 56px; margin-bottom: 16px; display: block; opacity: 0.4; }
+        .empty-state p { font-size: 15px; }
     </style>
 </head>
 <body>
     <div class="app-container">
-        
-        <div class="header">
-            <h1>Momentos ❤️</h1>
-            <button class="add-btn"><i class="fa-solid fa-plus"></i></button>
-        </div>
-        
-        <div class="content-area" style="padding-top: 0;">
+        <div class="content-area">
+            <div class="moments-header">
+                <h1>Momentos 💗</h1>
+                <button class="add-btn" id="addMomentBtn" aria-label="Añadir momento">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
+
             <div class="timeline" id="momentsTimeline">
-                <!-- Mock Moments -->
-                <div class="moment-card animate-fade-in">
-                    <div class="moment-img">
-                        <i class="fa-solid fa-image"></i>
-                    </div>
-                    <div class="moment-content">
-                        <div class="moment-date">14 de Febrero, 2024</div>
-                        <div class="moment-text">Nuestro primer viaje juntos. ¡Qué increíble fin de semana! ✨</div>
-                    </div>
-                </div>
-                
-                <div class="moment-card animate-fade-in" style="animation-delay: 0.1s;">
-                    <div class="moment-img" style="background-color: #a29bfe;">
-                        <i class="fa-solid fa-camera-retro"></i>
-                    </div>
-                    <div class="moment-content">
-                        <div class="moment-date">1 de Enero, 2024</div>
-                        <div class="moment-text">Empezando el año con la mejor compañía. 🎉</div>
-                    </div>
+                <!-- Se carga dinámicamente -->
+                <div class="empty-state" id="emptyState">
+                    <i class="fa-solid fa-images"></i>
+                    <p>Aún no hay momentos.<br>¡Crea el primero! ❤️</p>
                 </div>
             </div>
         </div>
@@ -133,7 +237,214 @@
             </a>
         </nav>
     </div>
-    
+
+    <!-- Modal Añadir Momento -->
+    <div class="modal-overlay" id="addMomentModal">
+        <div class="add-moment-modal">
+            <div class="modal-handle"></div>
+            <h2 class="modal-title">Nuevo momento ✨</h2>
+
+            <div class="emoji-picker" id="emojiPicker">
+                <button class="emoji-opt selected" data-emoji="💗">💗</button>
+                <button class="emoji-opt" data-emoji="🌹">🌹</button>
+                <button class="emoji-opt" data-emoji="✈️">✈️</button>
+                <button class="emoji-opt" data-emoji="🎉">🎉</button>
+                <button class="emoji-opt" data-emoji="🌅">🌅</button>
+                <button class="emoji-opt" data-emoji="🍕">🍕</button>
+                <button class="emoji-opt" data-emoji="🎵">🎵</button>
+                <button class="emoji-opt" data-emoji="⭐">⭐</button>
+            </div>
+
+            <textarea
+                class="moment-textarea"
+                id="momentText"
+                placeholder="Describe este momento especial..."
+                maxlength="500"
+            ></textarea>
+
+            <input
+                type="date"
+                class="moment-date-input"
+                id="momentDate"
+            >
+
+            <button class="btn btn-primary" id="saveMomentBtn">
+                <i class="fa-solid fa-heart"></i>
+                Guardar momento
+            </button>
+        </div>
+    </div>
+
     <script src="js/app.js"></script>
+    <script type="module">
+        import { rtdb } from './js/firebase.js';
+        import {
+            ref, push, onChildAdded, remove, serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+        const timeline   = document.getElementById('momentsTimeline');
+        const emptyState = document.getElementById('emptyState');
+        const modal      = document.getElementById('addMomentModal');
+        const addBtn     = document.getElementById('addMomentBtn');
+        const saveBtn    = document.getElementById('saveMomentBtn');
+        const textarea   = document.getElementById('momentText');
+        const dateInput  = document.getElementById('momentDate');
+        const emojiPicker = document.getElementById('emojiPicker');
+
+        // Fecha por defecto: hoy
+        dateInput.value = new Date().toISOString().split('T')[0];
+
+        let selectedEmoji = '💗';
+        let momentCount   = 0;
+
+        // Emoji picker
+        emojiPicker.addEventListener('click', (e) => {
+            const btn = e.target.closest('.emoji-opt');
+            if (!btn) return;
+            document.querySelectorAll('.emoji-opt').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedEmoji = btn.dataset.emoji;
+        });
+
+        // Abrir / cerrar modal
+        addBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+            textarea.focus();
+        });
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        });
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr + 'T12:00:00');
+            return d.toLocaleDateString('es-MX', {
+                day: 'numeric', month: 'long', year: 'numeric'
+            });
+        }
+
+        function renderMoment(key, data) {
+            emptyState.style.display = 'none';
+            momentCount++;
+
+            const card = document.createElement('div');
+            card.className = 'moment-card animate-fade-in';
+            card.dataset.key = key;
+
+            const safeText = (data.text || '')
+                .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+            const myRole = window.getMyId();
+            const isOwn  = data.author === myRole;
+
+            card.innerHTML = `
+                <div class="moment-emoji-img" style="background:${data.bgColor || 'rgba(255,75,114,0.08)'};">
+                    ${data.emoji || '💗'}
+                </div>
+                <div class="moment-content">
+                    <div class="moment-header-row">
+                        <div class="moment-date">${formatDate(data.date)}</div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span class="moment-author">${data.author === 'userA' ? 'A' : 'B'}</span>
+                            ${isOwn ? `<button class="moment-delete" data-key="${key}" title="Eliminar">✕</button>` : ''}
+                        </div>
+                    </div>
+                    <div class="moment-text">${safeText}</div>
+                </div>
+            `;
+
+            // Insertar al principio (más reciente primero)
+            const firstCard = timeline.querySelector('.moment-card');
+            if (firstCard) {
+                timeline.insertBefore(card, firstCard);
+            } else {
+                timeline.appendChild(card);
+            }
+
+            // Botón eliminar
+            const delBtn = card.querySelector('.moment-delete');
+            if (delBtn && rtdb) {
+                delBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (confirm('¿Eliminar este momento?')) {
+                        remove(ref(rtdb, 'moments/' + key))
+                            .then(() => {
+                                card.remove();
+                                momentCount--;
+                                if (momentCount <= 0) emptyState.style.display = 'block';
+                            })
+                            .catch(err => alert('Error al eliminar: ' + err.message));
+                    }
+                });
+            }
+        }
+
+        // Guardar momento
+        saveBtn.addEventListener('click', () => {
+            const text = textarea.value.trim();
+            if (!text) {
+                textarea.focus();
+                textarea.style.borderColor = '#e74c3c';
+                setTimeout(() => textarea.style.borderColor = '', 1500);
+                return;
+            }
+
+            const bgColors = [
+                'rgba(255,75,114,0.08)',
+                'rgba(162,155,254,0.12)',
+                'rgba(253,203,110,0.12)',
+                'rgba(85,239,196,0.1)',
+                'rgba(116,185,255,0.1)'
+            ];
+            const randomBg = bgColors[Math.floor(Math.random() * bgColors.length)];
+
+            const momentData = {
+                text:      text,
+                emoji:     selectedEmoji,
+                date:      dateInput.value,
+                author:    window.getMyId(),
+                bgColor:   randomBg,
+                timestamp: serverTimestamp()
+            };
+
+            if (rtdb) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Guardando...';
+
+                push(ref(rtdb, 'moments'), momentData)
+                    .then(() => {
+                        textarea.value = '';
+                        dateInput.value = new Date().toISOString().split('T')[0];
+                        modal.classList.remove('active');
+                    })
+                    .catch(err => alert('Error al guardar: ' + err.message))
+                    .finally(() => {
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = '<i class="fa-solid fa-heart"></i> Guardar momento';
+                    });
+            } else {
+                // Sin Firebase: guardar localmente
+                const key = 'local_' + Date.now();
+                momentData.timestamp = Date.now();
+                const local = JSON.parse(localStorage.getItem('localMoments') || '[]');
+                local.push({ key, ...momentData });
+                localStorage.setItem('localMoments', JSON.stringify(local));
+                renderMoment(key, momentData);
+                textarea.value = '';
+                modal.classList.remove('active');
+            }
+        });
+
+        // Escuchar momentos desde Firebase
+        if (rtdb) {
+            onChildAdded(ref(rtdb, 'moments'), (snapshot) => {
+                renderMoment(snapshot.key, snapshot.val());
+            });
+        } else {
+            // Cargar locales
+            const local = JSON.parse(localStorage.getItem('localMoments') || '[]');
+            local.reverse().forEach(m => renderMoment(m.key, m));
+        }
+    </script>
 </body>
 </html>
