@@ -8,16 +8,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const mapElement = document.getElementById('map');
     if (!mapElement) return;
 
-    // ── Inicializar Leaflet ───────────────────────────────
-    const defaultLocation = [19.4326, -99.1332]; // Ciudad de México como fallback
+    // ── Inicializar Leaflet ───────────────────────────────────
+    const defaultLocation = [19.4326, -99.1332]; // CDMX como fallback
     const map = L.map('map', {
         zoomControl: false,
         attributionControl: true
     }).setView(defaultLocation, 13);
 
-    // Tiles con estilo moderno
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+        attribution: '&copy; OSM &copy; CARTO',
         maxZoom: 19,
         subdomains: 'abcd'
     }).addTo(map);
@@ -26,44 +25,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const partnerRole = window.getPartnerId();
     const isA         = myRole === 'userA';
 
-    // ── Iconos personalizados ──────────────────────────────
-    function createDivIcon(label, color, pulse = false) {
-        return L.divIcon({
-            className: '',
-            html: `
-                <div style="
-                    width:44px; height:44px; border-radius:50%;
-                    background:${color}; border:3px solid white;
-                    box-shadow:0 4px 12px rgba(0,0,0,0.3);
-                    display:flex; align-items:center; justify-content:center;
-                    color:white; font-weight:700; font-size:16px;
-                    ${pulse ? 'animation:mapPulse 2s infinite;' : ''}
-                ">${label}</div>
-                ${pulse ? `<style>
-                    @keyframes mapPulse {
-                        0%,100%{box-shadow:0 4px 12px rgba(0,0,0,0.3)}
-                        50%{box-shadow:0 4px 24px rgba(255,75,114,0.6)}
-                    }
-                </style>` : ''}
-            `,
-            iconSize: [44, 44],
-            iconAnchor: [22, 22],
-            popupAnchor: [0, -24]
-        });
-    }
+    // ── Iconos: usar clases CSS (más fiable que inline flex en Leaflet) ──
+    // La clase 'map-pin-wrap' resetea los estilos de Leaflet
+    // La clase 'map-pin' aplica el estilo del círculo
+    const myIcon = L.divIcon({
+        className:  'map-pin-wrap',
+        html:       `<div class="map-pin map-pin-me">${isA ? 'A' : 'B'}</div>`,
+        iconSize:   [46, 46],
+        iconAnchor: [23, 23],
+        popupAnchor:[0, -26]
+    });
 
-    const myIcon      = createDivIcon(isA ? 'A' : 'B', '#ff4b72', true);
-    const partnerIcon = createDivIcon(isA ? 'B' : 'A', '#a29bfe', false);
+    const partnerIcon = L.divIcon({
+        className:  'map-pin-wrap',
+        html:       `<div class="map-pin map-pin-partner">${isA ? 'B' : 'A'}</div>`,
+        iconSize:   [46, 46],
+        iconAnchor: [23, 23],
+        popupAnchor:[0, -26]
+    });
 
     let myMarker      = null;
     let partnerMarker = null;
-    let hasSetInitialView = false;
+    let hasViewedMe   = false;
 
-    // ── Centrar mapa inteligentemente ─────────────────────
+    // ── Centrar mapa inteligentemente ─────────────────────────
     function updateMapBounds() {
         if (myMarker && partnerMarker) {
             const group = L.featureGroup([myMarker, partnerMarker]);
-            map.fitBounds(group.getBounds(), { padding: [60, 60], maxZoom: 16 });
+            try {
+                map.fitBounds(group.getBounds(), { padding: [70, 70], maxZoom: 16, animate: true });
+            } catch(e) {}
 
             const dist = map.distance(myMarker.getLatLng(), partnerMarker.getLatLng());
             const distEl = document.getElementById('mapDistance');
@@ -72,98 +63,114 @@ document.addEventListener('DOMContentLoaded', () => {
                     ? Math.round(dist) + ' m'
                     : (dist / 1000).toFixed(1) + ' km';
             }
-        } else if (myMarker && !hasSetInitialView) {
-            map.setView(myMarker.getLatLng(), 15);
-            hasSetInitialView = true;
+        } else if (myMarker && !hasViewedMe) {
+            map.setView(myMarker.getLatLng(), 15, { animate: true });
+            hasViewedMe = true;
+        } else if (partnerMarker && !hasViewedMe) {
+            // Si solo hay pareja pero no yo, centramos en ella
+            map.setView(partnerMarker.getLatLng(), 15, { animate: true });
+            hasViewedMe = true;
         }
     }
 
-    // ── Mi ubicación LOCAL (instantánea, sin esperar Firebase) ──
-    window.addEventListener('myLocationUpdated', (e) => {
-        const { lat, lng } = e.detail;
+    // ── Helper: colocar/actualizar mi marker ─────────────────
+    function setMyMarker(lat, lng) {
         if (!myMarker) {
-            myMarker = L.marker([lat, lng], { icon: myIcon })
-                .bindPopup('📍 Tú estás aquí')
+            myMarker = L.marker([lat, lng], { icon: myIcon, zIndexOffset: 100 })
+                .bindPopup('<b>📍 Tú estás aquí</b>')
                 .addTo(map);
         } else {
             myMarker.setLatLng([lat, lng]);
         }
         updateMapBounds();
-    });
+    }
 
-    // ── Ubicación de la pareja (LOCAL desde location.js) ──
-    window.addEventListener('partnerLocationUpdated', (e) => {
-        const { lat, lng } = e.detail;
+    // ── Helper: colocar/actualizar marker de la pareja ───────
+    function setPartnerMarker(lat, lng) {
         if (!partnerMarker) {
             partnerMarker = L.marker([lat, lng], { icon: partnerIcon })
-                .bindPopup('💗 Tu pareja')
+                .bindPopup('<b>💗 Tu pareja</b>')
                 .addTo(map);
         } else {
             partnerMarker.setLatLng([lat, lng]);
         }
         updateMapBounds();
+    }
+
+    // ── Mi ubicación LOCAL desde location.js (evento instantáneo) ──
+    window.addEventListener('myLocationUpdated', (e) => {
+        setMyMarker(e.detail.lat, e.detail.lng);
     });
 
-    // ── Firebase listeners (backup y sincronización) ───────
+    // ── Ubicación de la PAREJA desde location.js (evento) ────
+    // Este evento puede llegar tarde (race condition), por eso
+    // también escuchamos Firebase directamente (ver abajo).
+    window.addEventListener('partnerLocationUpdated', (e) => {
+        setPartnerMarker(e.detail.lat, e.detail.lng);
+    });
+
+    // ── Firebase: fuente principal para AMBAS ubicaciones ────
+    // Esto garantiza que funciona aunque los eventos lleguen
+    // antes de que map.js esté listo
     if (rtdb) {
-        // Mi ubicación desde Firebase (por si location.js no está en esta página)
+        // Mi ubicación en Firebase (backup del evento)
         onValue(ref(rtdb, 'locations/' + myRole), (snapshot) => {
             const data = snapshot.val();
-            if (!data || !data.lat) return;
-            if (!myMarker) {
-                myMarker = L.marker([data.lat, data.lng], { icon: myIcon })
-                    .bindPopup('📍 Tú estás aquí')
-                    .addTo(map);
-                updateMapBounds();
+            if (data && data.lat && data.lng) {
+                setMyMarker(data.lat, data.lng);
             }
         });
 
-        // Ubicación de la pareja desde Firebase
+        // Ubicación de la PAREJA en Firebase (principal para B→A y A→B)
         onValue(ref(rtdb, 'locations/' + partnerRole), (snapshot) => {
             const data = snapshot.val();
-            if (!data || !data.lat) return;
-            if (!partnerMarker) {
-                partnerMarker = L.marker([data.lat, data.lng], { icon: partnerIcon })
-                    .bindPopup('💗 Tu pareja')
-                    .addTo(map);
+            if (data && data.lat && data.lng) {
+                setPartnerMarker(data.lat, data.lng);
+
+                // Ocultar banner "sin pareja"
+                const noBanner = document.getElementById('noPartnerBanner');
+                if (noBanner) noBanner.style.display = 'none';
             } else {
-                partnerMarker.setLatLng([data.lat, data.lng]);
-            }
-            updateMapBounds();
-        });
-    }
-
-    // ── Botones de control ─────────────────────────────────
-    // Centrar en MI ubicación
-    const centerMeBtn = document.getElementById('centerMapBtn');
-    if (centerMeBtn) {
-        centerMeBtn.addEventListener('click', () => {
-            if (myMarker) {
-                map.setView(myMarker.getLatLng(), 16, { animate: true });
-            } else {
-                // Solicitar ubicación ahora
-                navigator.geolocation?.getCurrentPosition((pos) => {
-                    map.setView([pos.coords.latitude, pos.coords.longitude], 16, { animate: true });
-                });
+                // Pareja sin ubicación aún
+                const noBanner = document.getElementById('noPartnerBanner');
+                if (noBanner) noBanner.style.display = 'block';
             }
         });
-    }
 
-    // Centrar en la PAREJA
-    const centerPartnerBtn = document.getElementById('centerPartnerBtn');
-    if (centerPartnerBtn) {
-        centerPartnerBtn.addEventListener('click', () => {
-            if (partnerMarker) {
-                map.setView(partnerMarker.getLatLng(), 16, { animate: true });
+        // Detectar conectividad con Firebase RTDB
+        onValue(ref(rtdb, '.info/connected'), (snapshot) => {
+            const connected = snapshot.val() === true;
+            const indicator = document.getElementById('rtdbStatus');
+            if (indicator) {
+                indicator.style.display = connected ? 'none' : 'flex';
             }
+            console.log('[Firebase RTDB]', connected ? 'Conectado ✓' : 'Sin conexión ✗');
         });
+    } else {
+        // Firebase no inicializado
+        const indicator = document.getElementById('rtdbStatus');
+        if (indicator) indicator.style.display = 'flex';
     }
 
-    // Centrar en AMBOS
-    const centerBothBtn = document.getElementById('centerBothBtn');
-    if (centerBothBtn) {
-        centerBothBtn.addEventListener('click', () => {
-            updateMapBounds();
-        });
-    }
+    // ── Botones de control ────────────────────────────────────
+    document.getElementById('centerMapBtn')?.addEventListener('click', () => {
+        if (myMarker) {
+            map.setView(myMarker.getLatLng(), 16, { animate: true });
+        } else {
+            navigator.geolocation?.getCurrentPosition(pos => {
+                map.setView([pos.coords.latitude, pos.coords.longitude], 16, { animate: true });
+            });
+        }
+    });
+
+    document.getElementById('centerPartnerBtn')?.addEventListener('click', () => {
+        if (partnerMarker) {
+            map.setView(partnerMarker.getLatLng(), 16, { animate: true });
+        }
+    });
+
+    document.getElementById('centerBothBtn')?.addEventListener('click', () => {
+        hasViewedMe = false; // Forzar re-centrado
+        updateMapBounds();
+    });
 });

@@ -6,6 +6,17 @@ import {
     ref, set, onValue, serverTimestamp, onDisconnect
 } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
+// ── Detectar conexión RTDB (se ejecuta al cargar el módulo) ──
+if (rtdb) {
+    onValue(ref(rtdb, '.info/connected'), (snap) => {
+        const connected = snap.val() === true;
+        // Indicador en home.html y map.html
+        const indicator = document.getElementById('rtdbStatus');
+        if (indicator) indicator.style.display = connected ? 'none' : 'flex';
+        console.log('[Firebase RTDB]', connected ? '✓ Conectado' : '✗ Sin conexión (¿reglas?)' );
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
     const myRole = window.getMyId();
@@ -73,9 +84,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 partnerLastCoords = { lat: data.lat, lng: data.lng };
 
                 // Dispatchar evento para el mapa
-                window.dispatchEvent(
-                    new CustomEvent('partnerLocationUpdated', { detail: data })
-                );
+                // Usamos setTimeout para asegurar que map.js ya registró su listener
+                setTimeout(() => {
+                    window.dispatchEvent(
+                        new CustomEvent('partnerLocationUpdated', {
+                            detail: { lat: data.lat, lng: data.lng, timestamp: data.timestamp }
+                        })
+                    );
+                }, 0);
 
                 reverseGeocode(data.lat, data.lng, (place) => {
                     if (partnerLocationText) partnerLocationText.innerText = place;
@@ -89,7 +105,22 @@ document.addEventListener('DOMContentLoaded', () => {
                                          `Hace ${Math.floor(diffMins / 60)}h`;
                 }
 
+                // Mostrar en home: «Pareja sin ubicación» → ocultar
+                if (partnerLocationText && partnerLocationText.innerText === 'Sin ubicación') {
+                    partnerLocationText.innerText = 'Buscando...';
+                }
+
                 updateDistance();
+            } else {
+                // La pareja NO tiene ubicación en Firebase aún
+                if (partnerLocationText &&
+                    partnerLocationText.innerText === 'Buscando...') {
+                    partnerLocationText.innerText = 'Sin ubicación aún';
+                }
+                if (lastUpdatedText &&
+                    lastUpdatedText.innerText === 'Actualizando...') {
+                    lastUpdatedText.innerText = 'Esperando a tu pareja...';
+                }
             }
         });
 
